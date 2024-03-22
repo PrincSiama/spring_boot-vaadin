@@ -1,3 +1,4 @@
+/*
 package dev.sosnovsky.springboot.vaadin.controller;
 
 import dev.sosnovsky.springboot.vaadin.model.User;
@@ -15,8 +16,9 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
 
-    @GetMapping
+    @GetMapping("/users")
     public List<User> getUsers() {
         return userService.getUsers();
     }
 }
+*/

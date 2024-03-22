@@ -6,34 +6,36 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.time.LocalDate;
+
 @Data
 @Entity
-@Table(name = "users"   ,
+@Table(name = "users"   /*,
         uniqueConstraints =
                 {
                         @UniqueConstraint(columnNames = "id"),
                         @UniqueConstraint(columnNames = "email"),
-                        @UniqueConstraint(columnNames = "email")
-                }
+                        @UniqueConstraint(columnNames = "phone_number")
+                }*/
 )
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+//    @NotBlank
     @Column(name = "last_name")
     private String lastName;
 
-    @NotBlank
+//    @NotBlank
     @Column(name = "first_name")
     private String firstName;
 
     private String patronymic;
 
-    @NotBlank
+//    @NotBlank
     @Column(name = "date_of_birth")
-    private String dateOfBirth;
+    private LocalDate dateOfBirth;
 
     @Email
     private String email;
