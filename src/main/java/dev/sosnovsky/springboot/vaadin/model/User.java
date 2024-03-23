@@ -23,24 +23,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-//    @NotBlank
     @Column(name = "last_name")
     private String lastName;
 
-//    @NotBlank
     @Column(name = "first_name")
     private String firstName;
 
     private String patronymic;
 
-//    @NotBlank
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
 
-    @Email
     private String email;
 
     @Column(name = "phone_number")
-    @Pattern(regexp = "^((\\+7|7|8)+([0-9]){10})$", message = "Некорректный формат номера мобильного телефона")
     private String phoneNumber;
 }
