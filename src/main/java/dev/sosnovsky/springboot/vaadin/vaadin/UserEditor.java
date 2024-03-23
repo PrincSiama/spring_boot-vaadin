@@ -57,8 +57,11 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         addKeyPressListener(Key.ENTER, e -> save());
 
         save.addClickListener(e -> save());
+        save.addClickShortcut(Key.ENTER);
         delete.addClickListener(e -> delete());
+        delete.addClickShortcut(Key.DELETE);
         cancel.addClickListener(e -> setVisible(false));
+        cancel.addClickShortcut(Key.ESCAPE);
         setVisible(false);
     }
 

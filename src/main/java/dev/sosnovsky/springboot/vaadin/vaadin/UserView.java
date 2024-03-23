@@ -42,10 +42,5 @@ public class UserView extends VerticalLayout {
         grid.setItems(userService.getUserByEmail(email).get());
 
         logout.addClickListener(click -> securityService.logout());
-
-        userEditor.setChangeHandler(() -> {
-            userEditor.setVisible(false);
-            grid.setItems(userService.getUsers());
-        });
     }
 }
