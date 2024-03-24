@@ -19,16 +19,19 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
+        // настройка страницы /login
         setLoginView(http, LoginView.class);
+        // применение обработчика успешной аутентификации
         http.formLogin(login -> login
                 .successHandler(myAuthenticationSuccessHandler()));
     }
 
     @Bean
-    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
+    public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
         return new MySimpleUrlAuthenticationSuccessHandler();
     }
 
+    // в рамках тестового задания логины и пароли пользователей хранятся в памяти
     @Bean
     public UserDetailsManager userDetailsService() {
         UserDetails user1 =

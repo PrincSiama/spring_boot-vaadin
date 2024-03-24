@@ -24,13 +24,15 @@ public class UserView extends VerticalLayout {
 
     @Autowired
     public UserView(UserService userService, UserEditor userEditor, SecurityService securityService) {
-        this.userService= userService;
+        this.userService = userService;
         this.securityService = securityService;
         this.grid = new Grid<>(User.class);
 
+        // задаём порядок расположения колонок
         grid.setColumns("id", "lastName", "firstName", "patronymic", "dateOfBirth", "email", "phoneNumber");
         grid.setColumnReorderingAllowed(true);
 
+        // задаём отображаемые на странице заголовки
         grid.getColumnByKey("id").setHeader("id").setSortProperty("id");
         grid.getColumnByKey("lastName").setHeader("Фамилия");
         grid.getColumnByKey("firstName").setHeader("Имя");
@@ -38,6 +40,7 @@ public class UserView extends VerticalLayout {
         grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения");
         grid.getColumnByKey("email").setHeader("Email");
         grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона");
+        // добавляем общие свойства для всех колонок
         grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
         grid.addComponentColumn(user -> {
@@ -47,7 +50,9 @@ public class UserView extends VerticalLayout {
         }).setHeader("Изображение");
 
         add(horizontalLayout, grid);
+        // получаем email пользователя из аутентификации
         String email = securityService.getAuthenticatedUser().getUsername();
+        // по полученному email находим пользователя
         grid.setItems(userService.getUserByEmail(email).get());
 
         grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);

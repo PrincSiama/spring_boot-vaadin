@@ -11,10 +11,10 @@ import org.springframework.security.web.WebAttributes;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+// настройка обработчика успешной аутентификации для перенаправления в зависимости от роли
 public class MySimpleUrlAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
@@ -40,23 +40,29 @@ public class MySimpleUrlAuthenticationSuccessHandler implements AuthenticationSu
         roleTargetUrlMap.put("ROLE_USER", "user");
         roleTargetUrlMap.put("ROLE_ADMIN", "admin");
 
-        final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        // получаем роль авторизованного пользователя
+        String userRole = authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority).findFirst().get();
+        // получаем путь для перенаправления в зависимости от роли
+        if (roleTargetUrlMap.containsKey(userRole)) {
+            return roleTargetUrlMap.get(userRole);
+        }
+
+       /* final Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
         for (final GrantedAuthority grantedAuthority : authorities) {
             String authorityName = grantedAuthority.getAuthority();
             if(roleTargetUrlMap.containsKey(authorityName)) {
                 return roleTargetUrlMap.get(authorityName);
             }
-        }
+        }*/
         throw new IllegalStateException();
     }
 
     protected final void clearAuthenticationAttributes(final HttpServletRequest request) {
         final HttpSession session = request.getSession(false);
-
         if (session == null) {
             return;
         }
-
         session.removeAttribute(WebAttributes.AUTHENTICATION_EXCEPTION);
     }
 }

@@ -12,8 +12,6 @@ import dev.sosnovsky.springboot.vaadin.security.SecurityService;
 import dev.sosnovsky.springboot.vaadin.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 //@Component
 //@Scope("prototype")
@@ -30,14 +28,16 @@ public class AdminView extends VerticalLayout {
 
     @Autowired
     public AdminView(UserService userService, UserEditor userEditor, SecurityService securityService) {
-        this.userService= userService;
+        this.userService = userService;
         this.userEditor = userEditor;
         this.securityService = securityService;
         this.grid = new Grid<>(User.class);
 
+        // задаём порядок расположения колонок
         grid.setColumns("id", "lastName", "firstName", "patronymic", "dateOfBirth", "email", "phoneNumber");
         grid.setColumnReorderingAllowed(true);
 
+        // задаём отображаемые на странице заголовки
         grid.getColumnByKey("id").setHeader("id").setSortProperty("id");
         grid.getColumnByKey("lastName").setHeader("Фамилия");
         grid.getColumnByKey("firstName").setHeader("Имя");
@@ -45,20 +45,23 @@ public class AdminView extends VerticalLayout {
         grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения");
         grid.getColumnByKey("email").setHeader("Email");
         grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона");
+
         grid.addComponentColumn(user -> {
             Image image = new Image(user.getImageLink(), "Изображение отсутствует");
             image.setWidth("100px");
             return image;
         }).setHeader("Изображение");
 
-
+        // добавляем общие свойства для всех колонок
         grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
         add(horizontalLayout, grid, userEditor);
         grid.setItems(userService.getUsers());
 
+        // определяем действие для редактирования выбранного из списка пользователя
         grid.asSingleSelect().addValueChangeListener(click -> userEditor.editUser(click.getValue()));
 
+        // определяем действие на нажатие кнопки "Добавить нового пользователя"
         createUserBtn.addClickListener(click -> userEditor.editUser(new User()));
         logout.addClickListener(click -> securityService.logout());
 

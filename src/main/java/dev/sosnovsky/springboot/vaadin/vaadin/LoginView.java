@@ -13,6 +13,7 @@ import dev.sosnovsky.springboot.vaadin.security.SecurityService;
 @AnonymousAllowed
 public class LoginView extends VerticalLayout {
     private final SecurityService securityService;
+    // настраиваем отображение страницы /login
     public LoginView(SecurityService securityService) {
         this.securityService = securityService;
         setSizeFull();

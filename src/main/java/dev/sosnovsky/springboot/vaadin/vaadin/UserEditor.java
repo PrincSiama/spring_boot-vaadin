@@ -19,8 +19,6 @@ import dev.sosnovsky.springboot.vaadin.model.User;
 import dev.sosnovsky.springboot.vaadin.service.UserService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
@@ -45,7 +43,6 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
     Button delete = new Button("Удалить", VaadinIcon.TRASH.create());
     HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
-    //    BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
     Binder<User> binder = new Binder<>(User.class);
     boolean validatedEmailAndPhoneNumber = true;
 
@@ -60,6 +57,7 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
     public UserEditor(UserService userService) {
         this.userService = userService;
 
+        // настраиваем поля и правила их валидации
         binderRequiredTextField(lastName, "Фамилия должна быть заполнена", "lastName");
         binderRequiredTextField(firstName, "Имя должно быть заполнено", "firstName");
         binderRequiredTextField(phoneNumber, "Необходимо указать корректный номер мобильного телефона",
@@ -92,6 +90,7 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
+        // настройка действий при нажатии кнопок
         save.addClickListener(e -> validateAndSave());
         save.addClickShortcut(Key.ENTER);
         delete.addClickListener(e -> delete());
@@ -100,6 +99,8 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         setVisible(false);
     }
 
+    // метод служит для валидации сохраняемых пользователей и
+    // предотвращения сохранения нескольких пользователей с одинаковыми email и номерами телефона
     public void validateAndSave() {
         if (binder.isValid()) {
             if (!isExistsEmailOrPhoneNumber()) {
@@ -115,7 +116,7 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         }
     }
 
-
+    // перед удалением пользователя убеждаемся, что пользователь с таким email есть в базе данных
     public void delete() {
         if (userService.getUserByEmail(user.getEmail()).isPresent()) {
             userService.deleteUser(userService.getUserByEmail(user.getEmail()).get());
@@ -126,17 +127,24 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         }
     }
 
+    // редактирование существующего или создание нового пользователя
     public void editUser(User newUser) {
         if (newUser == null) {
             setVisible(false);
             return;
         }
 
+        // если у пользователя имеется email, то получаем пользователя из базы для редактирования,
+        // запрещая изменение email и номера телефона,
+        // а также отключаем необходимость валидации этих полей при сохранении
         if (newUser.getEmail() != null) {
             user = userService.getUserByEmail(newUser.getEmail()).get();
             email.setReadOnly(true);
             phoneNumber.setReadOnly(true);
             validatedEmailAndPhoneNumber = false;
+
+            // если пользователь новый, то разрешаем заполнение всех полей и проводим полную валидацию,
+            // включая поиск email и номера телефона в базе данных у существующих пользователей
         } else {
             email.setReadOnly(false);
             phoneNumber.setReadOnly(false);
@@ -150,12 +158,15 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         lastName.focus();
     }
 
+    // метод для bind текстовых полей с обязательным заполнением
     private void binderRequiredTextField(TextField field, String message, String propertyName) {
         binder.forField(field)
                 .asRequired(message)
                 .bind(propertyName);
     }
 
+    // метод для проверки дубликатов вводимых у нового пользователя email и номера телефона
+    // в базе данных у существующих пользователей
     private boolean isExistsEmailOrPhoneNumber() {
         if (validatedEmailAndPhoneNumber) {
             return userService.getUserByEmail(user.getEmail()).isPresent() ||
