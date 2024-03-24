@@ -42,4 +42,7 @@ public class User {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "image_link")
+    private String imageLink;
 }

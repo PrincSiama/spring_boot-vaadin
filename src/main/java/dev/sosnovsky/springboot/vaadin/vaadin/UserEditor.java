@@ -19,11 +19,15 @@ import dev.sosnovsky.springboot.vaadin.model.User;
 import dev.sosnovsky.springboot.vaadin.service.UserService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @UIScope
 @SpringComponent
+//@Component
+//@Scope("prototype")
 public class UserEditor extends VerticalLayout implements KeyNotifier {
     private final UserService userService;
     private User user;
@@ -34,6 +38,7 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
     DatePicker dateOfBirth = new DatePicker("Дата рождения");
     EmailField email = new EmailField("Email адрес");
     TextField phoneNumber = new TextField("Номер мобильного телефона");
+    TextField imageLink = new TextField("Ссылка на изображение");
 
     Button save = new Button("Сохранить", VaadinIcon.CHECK.create());
     Button cancel = new Button("Отмена");
@@ -76,9 +81,12 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
 
         phoneNumber.setPattern("^((\\+7|7|8)+([0-9]){10})$");
 
+        binder.forField(imageLink)
+                .bind("imageLink");
+
         binder.setBean(user);
 
-        add(lastName, firstName, patronymic, dateOfBirth, email, phoneNumber, actions);
+        add(lastName, firstName, patronymic, dateOfBirth, email, phoneNumber, imageLink, actions);
 
         setSpacing(true);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -91,18 +99,6 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         cancel.addClickShortcut(Key.ESCAPE);
         setVisible(false);
     }
-
-    /*public void save() {
-        if (user.getLastName() == null || user.getFirstName() == null || user.getDateOfBirth() == null ||
-        user.getEmail() == null || user.getPhoneNumber() == null) {
-            Notification.show("Невозможно сохранить пользователя. " +
-                    "Все обязательные поля должны быть корректно заполнены");
-        } else {
-            userService.createUser(user);
-            Notification.show("Пользователь сохранён");
-            changeHandler.onChange();
-        }
-    }*/
 
     public void validateAndSave() {
         if (binder.isValid()) {

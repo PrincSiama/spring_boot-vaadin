@@ -3,6 +3,7 @@ package dev.sosnovsky.springboot.vaadin.vaadin;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,6 +12,8 @@ import dev.sosnovsky.springboot.vaadin.security.SecurityService;
 import dev.sosnovsky.springboot.vaadin.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 //@Component
 //@Scope("prototype")
@@ -20,8 +23,8 @@ public class AdminView extends VerticalLayout {
     private final SecurityService securityService;
     private final UserService userService;
     public final Grid<User> grid;
-    private final Button createUserBtn = new Button("Добавить нового пользователя");
-    private final Button logout = new Button("Выйти");
+    public Button createUserBtn = new Button("Добавить нового пользователя");
+    public final Button logout = new Button("Выйти");
     private final HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
     private final UserEditor userEditor;
 
@@ -42,6 +45,13 @@ public class AdminView extends VerticalLayout {
         grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения");
         grid.getColumnByKey("email").setHeader("Email");
         grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона");
+        grid.addComponentColumn(user -> {
+            Image image = new Image(user.getImageLink(), "Изображение отсутствует");
+            image.setWidth("100px");
+            return image;
+        }).setHeader("Изображение");
+
+
         grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
         add(horizontalLayout, grid, userEditor);

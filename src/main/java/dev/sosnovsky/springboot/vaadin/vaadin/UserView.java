@@ -3,6 +3,7 @@ package dev.sosnovsky.springboot.vaadin.vaadin;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Image;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -38,6 +39,12 @@ public class UserView extends VerticalLayout {
         grid.getColumnByKey("email").setHeader("Email");
         grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона");
         grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
+
+        grid.addComponentColumn(user -> {
+            Image image = new Image(user.getImageLink(), "Изображение отсутствует");
+            image.setWidth("100px");
+            return image;
+        }).setHeader("Изображение");
 
         add(horizontalLayout, grid);
         String email = securityService.getAuthenticatedUser().getUsername();
