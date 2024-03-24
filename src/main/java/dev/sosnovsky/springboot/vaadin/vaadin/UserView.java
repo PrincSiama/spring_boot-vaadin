@@ -2,6 +2,7 @@ package dev.sosnovsky.springboot.vaadin.vaadin;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -29,17 +30,20 @@ public class UserView extends VerticalLayout {
         grid.setColumns("id", "lastName", "firstName", "patronymic", "dateOfBirth", "email", "phoneNumber");
         grid.setColumnReorderingAllowed(true);
 
-        grid.getColumnByKey("id").setHeader("id").setAutoWidth(true).setResizable(true).setSortProperty("id");
-        grid.getColumnByKey("lastName").setHeader("Фамилия").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("firstName").setHeader("Имя").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("patronymic").setHeader("Отчество").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("email").setHeader("Email").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона").setAutoWidth(true).setResizable(true);
+        grid.getColumnByKey("id").setHeader("id").setSortProperty("id");
+        grid.getColumnByKey("lastName").setHeader("Фамилия");
+        grid.getColumnByKey("firstName").setHeader("Имя");
+        grid.getColumnByKey("patronymic").setHeader("Отчество");
+        grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения");
+        grid.getColumnByKey("email").setHeader("Email");
+        grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона");
+        grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
         add(horizontalLayout, grid);
         String email = securityService.getAuthenticatedUser().getUsername();
         grid.setItems(userService.getUserByEmail(email).get());
+
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
 
         logout.addClickListener(click -> securityService.logout());
     }

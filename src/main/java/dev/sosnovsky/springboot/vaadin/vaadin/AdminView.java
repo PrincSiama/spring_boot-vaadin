@@ -2,6 +2,7 @@ package dev.sosnovsky.springboot.vaadin.vaadin;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -11,12 +12,14 @@ import dev.sosnovsky.springboot.vaadin.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
+//@Component
+//@Scope("prototype")
 @Route("admin")
 @RolesAllowed("ADMIN")
 public class AdminView extends VerticalLayout {
     private final SecurityService securityService;
     private final UserService userService;
-    private final Grid<User> grid;
+    public final Grid<User> grid;
     private final Button createUserBtn = new Button("Добавить нового пользователя");
     private final Button logout = new Button("Выйти");
     private final HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
@@ -32,13 +35,14 @@ public class AdminView extends VerticalLayout {
         grid.setColumns("id", "lastName", "firstName", "patronymic", "dateOfBirth", "email", "phoneNumber");
         grid.setColumnReorderingAllowed(true);
 
-        grid.getColumnByKey("id").setHeader("id").setAutoWidth(true).setResizable(true).setSortProperty("id");
-        grid.getColumnByKey("lastName").setHeader("Фамилия").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("firstName").setHeader("Имя").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("patronymic").setHeader("Отчество").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("email").setHeader("Email").setAutoWidth(true).setResizable(true);
-        grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона").setAutoWidth(true).setResizable(true);
+        grid.getColumnByKey("id").setHeader("id").setSortProperty("id");
+        grid.getColumnByKey("lastName").setHeader("Фамилия");
+        grid.getColumnByKey("firstName").setHeader("Имя");
+        grid.getColumnByKey("patronymic").setHeader("Отчество");
+        grid.getColumnByKey("dateOfBirth").setHeader("Дата рождения");
+        grid.getColumnByKey("email").setHeader("Email");
+        grid.getColumnByKey("phoneNumber").setHeader("Номер мобильного телефона");
+        grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
         add(horizontalLayout, grid, userEditor);
         grid.setItems(userService.getUsers());
@@ -47,6 +51,9 @@ public class AdminView extends VerticalLayout {
 
         createUserBtn.addClickListener(click -> userEditor.editUser(new User()));
         logout.addClickListener(click -> securityService.logout());
+
+        grid.addThemeVariants(GridVariant.LUMO_COLUMN_BORDERS);
+        grid.addThemeVariants(GridVariant.LUMO_ROW_STRIPES);
 
         userEditor.setChangeHandler(() -> {
             userEditor.setVisible(false);

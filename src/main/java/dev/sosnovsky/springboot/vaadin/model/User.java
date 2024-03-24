@@ -1,24 +1,28 @@
 package dev.sosnovsky.springboot.vaadin.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "users"   /*,
-        uniqueConstraints =
-                {
-                        @UniqueConstraint(columnNames = "id"),
-                        @UniqueConstraint(columnNames = "email"),
-                        @UniqueConstraint(columnNames = "phone_number")
-                }*/
-)
+@Table(name = "users")
+@NoArgsConstructor
+@AllArgsConstructor
 public class User {
+    public User(String lastName, String firstName, String patronymic,
+                LocalDate dateOfBirth, String email, String phoneNumber) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.patronymic = patronymic;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

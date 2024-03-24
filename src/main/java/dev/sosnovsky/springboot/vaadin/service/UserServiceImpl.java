@@ -19,11 +19,6 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User editUser(User user) {
-        return null;
-    }
-
-    @Override
     public void deleteUser(User user) {
         userRepository.delete(user);
     }
@@ -36,5 +31,10 @@ public class UserServiceImpl implements UserService {
     @Override
     public Optional<User> getUserByEmail(String email) {
         return userRepository.findAllByEmail(email);
+    }
+
+    @Override
+    public Optional<User> getUserByPhoneNumber(String phoneNumber) {
+        return userRepository.findAllByPhoneNumber(phoneNumber);
     }
 }

@@ -6,11 +6,11 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.EmailField;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.data.binder.BeanValidationBinder;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.validator.EmailValidator;
 import com.vaadin.flow.spring.annotation.SpringComponent;
@@ -20,8 +20,10 @@ import dev.sosnovsky.springboot.vaadin.service.UserService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@SpringComponent
+import java.time.LocalDate;
+
 @UIScope
+@SpringComponent
 public class UserEditor extends VerticalLayout implements KeyNotifier {
     private final UserService userService;
     private User user;
@@ -38,7 +40,9 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
     Button delete = new Button("Удалить", VaadinIcon.TRASH.create());
     HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
 
-    BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
+    //    BeanValidationBinder<User> binder = new BeanValidationBinder<>(User.class);
+    Binder<User> binder = new Binder<>(User.class);
+    boolean validatedEmailAndPhoneNumber = true;
 
     @Setter
     private ChangeHandler changeHandler;
@@ -51,18 +55,16 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
     public UserEditor(UserService userService) {
         this.userService = userService;
 
-        binder.forField(lastName)
-                .asRequired("Фамилия должна быть заполнена")
-                .bind("lastName");
-
-        binder.forField(firstName)
-                .asRequired("Имя должно быть заполнено")
-                        .bind("firstName");
+        binderRequiredTextField(lastName, "Фамилия должна быть заполнена", "lastName");
+        binderRequiredTextField(firstName, "Имя должно быть заполнено", "firstName");
+        binderRequiredTextField(phoneNumber, "Необходимо указать корректный номер мобильного телефона",
+                "phoneNumber");
 
         binder.forField(patronymic)
                 .bind("patronymic");
 
         dateOfBirth.setHelperText("В формате DD.MM.YYYY");
+        dateOfBirth.setMax(LocalDate.now());
         binder.forField(dateOfBirth)
                 .asRequired("Дата рождения должна быть заполнена")
                 .bind("dateOfBirth");
@@ -72,25 +74,17 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
                 .withValidator(new EmailValidator("Необходимо указать корректный email"))
                 .bind("email");
 
-        binder.forField(phoneNumber)
-                .asRequired("Необходимо указать корректный номер мобильного телефона")
-                .bind("phoneNumber");
-
         phoneNumber.setPattern("^((\\+7|7|8)+([0-9]){10})$");
 
-//        binder.setBean(user);
-
+        binder.setBean(user);
 
         add(lastName, firstName, patronymic, dateOfBirth, email, phoneNumber, actions);
-//        binder.bindInstanceFields(this);
 
         setSpacing(true);
         save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
-        addKeyPressListener(Key.ENTER, e -> save());
-
-        save.addClickListener(e -> save());
+        save.addClickListener(e -> validateAndSave());
         save.addClickShortcut(Key.ENTER);
         delete.addClickListener(e -> delete());
         cancel.addClickListener(e -> setVisible(false));
@@ -98,14 +92,42 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         setVisible(false);
     }
 
-    public void save() {
-        userService.createUser(user);
-        changeHandler.onChange();
+    /*public void save() {
+        if (user.getLastName() == null || user.getFirstName() == null || user.getDateOfBirth() == null ||
+        user.getEmail() == null || user.getPhoneNumber() == null) {
+            Notification.show("Невозможно сохранить пользователя. " +
+                    "Все обязательные поля должны быть корректно заполнены");
+        } else {
+            userService.createUser(user);
+            Notification.show("Пользователь сохранён");
+            changeHandler.onChange();
+        }
+    }*/
+
+    public void validateAndSave() {
+        if (binder.isValid()) {
+            if (!isExistsEmailOrPhoneNumber()) {
+                userService.createUser(user);
+                changeHandler.onChange();
+                Notification.show("Пользователь сохранён");
+            } else {
+                Notification.show("Пользователь с таким email или номером телефона уже существует");
+            }
+        } else {
+            Notification.show("Невозможно сохранить пользователя. " +
+                    "Все обязательные поля должны быть корректно заполнены");
+        }
     }
 
+
     public void delete() {
-        userService.deleteUser(user);
-        changeHandler.onChange();
+        if (userService.getUserByEmail(user.getEmail()).isPresent()) {
+            userService.deleteUser(userService.getUserByEmail(user.getEmail()).get());
+            Notification.show("Пользователь удалён");
+            changeHandler.onChange();
+        } else {
+            Notification.show("Невозможно удалить. Пользователь с такими данными не существует");
+        }
     }
 
     public void editUser(User newUser) {
@@ -115,13 +137,36 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         }
 
         if (newUser.getEmail() != null) {
-            user = userService.getUserByEmail(newUser.getEmail()).orElse(newUser);
+            user = userService.getUserByEmail(newUser.getEmail()).get();
+            email.setReadOnly(true);
+            phoneNumber.setReadOnly(true);
+            validatedEmailAndPhoneNumber = false;
         } else {
+            email.setReadOnly(false);
+            phoneNumber.setReadOnly(false);
+            validatedEmailAndPhoneNumber = true;
             user = newUser;
         }
 
+        cancel.setVisible(true);
         binder.setBean(user);
         setVisible(true);
         lastName.focus();
+    }
+
+    private void binderRequiredTextField(TextField field, String message, String propertyName) {
+        binder.forField(field)
+                .asRequired(message)
+                .bind(propertyName);
+    }
+
+    private boolean isExistsEmailOrPhoneNumber() {
+        if (validatedEmailAndPhoneNumber) {
+            return userService.getUserByEmail(user.getEmail()).isPresent() ||
+                    userService.getUserByPhoneNumber(user.getPhoneNumber()).isPresent();
+        } else {
+            validatedEmailAndPhoneNumber = true;
+            return false;
+        }
     }
 }
