@@ -1,4 +1,4 @@
-package dev.sosnovsky.springboot.vaadin.vaadin;
+package dev.sosnovsky.springboot.vaadin.view;
 
 import com.vaadin.flow.component.Key;
 import com.vaadin.flow.component.KeyNotifier;
@@ -19,29 +19,26 @@ import dev.sosnovsky.springboot.vaadin.model.User;
 import dev.sosnovsky.springboot.vaadin.service.UserService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @UIScope
 @SpringComponent
-//@Component
-//@Scope("prototype")
 public class UserEditor extends VerticalLayout implements KeyNotifier {
-    private final UserService userService;
-    private User user;
+    UserService userService;
+    User user;
 
-    TextField lastName = new TextField("Фамилия");
-    TextField firstName = new TextField("Имя");
-    TextField patronymic = new TextField("Отчество");
-    DatePicker dateOfBirth = new DatePicker("Дата рождения");
-    EmailField email = new EmailField("Email адрес");
-    TextField phoneNumber = new TextField("Номер мобильного телефона");
-    TextField imageLink = new TextField("Ссылка на изображение");
+    private final TextField lastName = new TextField("Фамилия");
+    private final TextField firstName = new TextField("Имя");
+    private final TextField patronymic = new TextField("Отчество");
+    private final DatePicker dateOfBirth = new DatePicker("Дата рождения");
+    private final EmailField email = new EmailField("Email адрес");
+    private final TextField phoneNumber = new TextField("Номер мобильного телефона");
+    private final TextField imageLink = new TextField("Ссылка на изображение");
 
-    Button save = new Button("Сохранить", VaadinIcon.CHECK.create());
-    Button cancel = new Button("Отмена");
-    Button delete = new Button("Удалить", VaadinIcon.TRASH.create());
-    HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
+    private final Button cancel = new Button("Отмена");
 
     Binder<User> binder = new Binder<>(User.class);
     boolean validatedEmailAndPhoneNumber = true;
@@ -58,6 +55,27 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
         this.userService = userService;
 
         // настраиваем поля и правила их валидации
+        setUpFieldAndValidation();
+
+        Button delete = new Button("Удалить", VaadinIcon.TRASH.create());
+        Button save = new Button("Сохранить", VaadinIcon.CHECK.create());
+        HorizontalLayout actions = new HorizontalLayout(save, cancel, delete);
+        add(lastName, firstName, patronymic, dateOfBirth, email, phoneNumber, imageLink, actions);
+
+        setSpacing(true);
+        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+        // настройка действий при нажатии кнопок
+        save.addClickListener(e -> validateAndSave());
+        save.addClickShortcut(Key.ENTER);
+        delete.addClickListener(e -> delete());
+        cancel.addClickListener(e -> setVisible(false));
+        cancel.addClickShortcut(Key.ESCAPE);
+        setVisible(false);
+    }
+
+    private void setUpFieldAndValidation() {
         binderRequiredTextField(lastName, "Фамилия должна быть заполнена", "lastName");
         binderRequiredTextField(firstName, "Имя должно быть заполнено", "firstName");
         binderRequiredTextField(phoneNumber, "Необходимо указать корректный номер мобильного телефона",
@@ -83,20 +101,6 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
                 .bind("imageLink");
 
         binder.setBean(user);
-
-        add(lastName, firstName, patronymic, dateOfBirth, email, phoneNumber, imageLink, actions);
-
-        setSpacing(true);
-        save.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        delete.addThemeVariants(ButtonVariant.LUMO_ERROR);
-
-        // настройка действий при нажатии кнопок
-        save.addClickListener(e -> validateAndSave());
-        save.addClickShortcut(Key.ENTER);
-        delete.addClickListener(e -> delete());
-        cancel.addClickListener(e -> setVisible(false));
-        cancel.addClickShortcut(Key.ESCAPE);
-        setVisible(false);
     }
 
     // метод служит для валидации сохраняемых пользователей и
@@ -143,8 +147,8 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
             phoneNumber.setReadOnly(true);
             validatedEmailAndPhoneNumber = false;
 
-            // если пользователь новый, то разрешаем заполнение всех полей и проводим полную валидацию,
-            // включая поиск email и номера телефона в базе данных у существующих пользователей
+        // если пользователь новый, то разрешаем заполнение всех полей и проводим полную валидацию,
+        // включая поиск email и номера телефона в базе данных у существующих пользователей
         } else {
             email.setReadOnly(false);
             phoneNumber.setReadOnly(false);

@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 // настройка обработчика успешной аутентификации для перенаправления в зависимости от роли
-public class MySimpleUrlAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
+public class AuthenticationSuccessHandlerImpl implements AuthenticationSuccessHandler {
 
     private final RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 

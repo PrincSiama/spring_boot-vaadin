@@ -1,4 +1,4 @@
-package dev.sosnovsky.springboot.vaadin.vaadin;
+package dev.sosnovsky.springboot.vaadin.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -16,17 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route("user")
 @RolesAllowed("USER")
 public class UserView extends VerticalLayout {
-    private final SecurityService securityService;
-    private final UserService userService;
-    private final Grid<User> grid;
-    private final Button logout = new Button("Выйти");
-    private final HorizontalLayout horizontalLayout = new HorizontalLayout(logout);
 
     @Autowired
-    public UserView(UserService userService, UserEditor userEditor, SecurityService securityService) {
-        this.userService = userService;
-        this.securityService = securityService;
-        this.grid = new Grid<>(User.class);
+    public UserView(UserService userService, SecurityService securityService) {
+        Grid<User> grid = new Grid<>(User.class);
 
         // задаём порядок расположения колонок
         grid.setColumns("id", "lastName", "firstName", "patronymic", "dateOfBirth", "email", "phoneNumber");
@@ -49,6 +42,8 @@ public class UserView extends VerticalLayout {
             return image;
         }).setHeader("Изображение");
 
+        Button logout = new Button("Выйти");
+        HorizontalLayout horizontalLayout = new HorizontalLayout(logout);
         add(horizontalLayout, grid);
         // получаем email пользователя из аутентификации
         String email = securityService.getAuthenticatedUser().getUsername();

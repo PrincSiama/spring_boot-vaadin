@@ -23,6 +23,17 @@ public class User {
         this.phoneNumber = phoneNumber;
     }
 
+    public User(String lastName, String firstName, String patronymic,
+                LocalDate dateOfBirth, String email, String phoneNumber, String imageLink) {
+        this.lastName = lastName;
+        this.firstName = firstName;
+        this.patronymic = patronymic;
+        this.dateOfBirth = dateOfBirth;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.imageLink = imageLink;
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

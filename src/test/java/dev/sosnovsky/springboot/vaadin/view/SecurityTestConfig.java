@@ -1,3 +1,4 @@
+/*
 package dev.sosnovsky.springboot.vaadin.view;
 
 import org.springframework.context.annotation.Bean;
@@ -31,3 +32,4 @@ public class SecurityTestConfig {
         };
     }
 }
+*/

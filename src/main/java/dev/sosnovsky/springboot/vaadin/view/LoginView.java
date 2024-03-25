@@ -1,4 +1,4 @@
-package dev.sosnovsky.springboot.vaadin.vaadin;
+package dev.sosnovsky.springboot.vaadin.view;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
@@ -12,10 +12,8 @@ import dev.sosnovsky.springboot.vaadin.security.SecurityService;
 @Route("login")
 @AnonymousAllowed
 public class LoginView extends VerticalLayout {
-    private final SecurityService securityService;
     // настраиваем отображение страницы /login
     public LoginView(SecurityService securityService) {
-        this.securityService = securityService;
         setSizeFull();
         setAlignItems(Alignment.CENTER);
         setJustifyContentMode(JustifyContentMode.CENTER);

@@ -1,7 +1,7 @@
 package dev.sosnovsky.springboot.vaadin.security;
 
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import dev.sosnovsky.springboot.vaadin.vaadin.LoginView;
+import dev.sosnovsky.springboot.vaadin.view.LoginView;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -23,12 +23,12 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         setLoginView(http, LoginView.class);
         // применение обработчика успешной аутентификации
         http.formLogin(login -> login
-                .successHandler(myAuthenticationSuccessHandler()));
+                .successHandler(authenticationSuccessHandler()));
     }
 
     @Bean
-    public AuthenticationSuccessHandler myAuthenticationSuccessHandler() {
-        return new MySimpleUrlAuthenticationSuccessHandler();
+    public AuthenticationSuccessHandler authenticationSuccessHandler() {
+        return new AuthenticationSuccessHandlerImpl();
     }
 
     // в рамках тестового задания логины и пароли пользователей хранятся в памяти

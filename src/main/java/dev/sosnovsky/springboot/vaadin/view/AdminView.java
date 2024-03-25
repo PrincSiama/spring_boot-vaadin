@@ -1,4 +1,4 @@
-package dev.sosnovsky.springboot.vaadin.vaadin;
+package dev.sosnovsky.springboot.vaadin.view;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
@@ -13,24 +13,13 @@ import dev.sosnovsky.springboot.vaadin.service.UserService;
 import jakarta.annotation.security.RolesAllowed;
 import org.springframework.beans.factory.annotation.Autowired;
 
-//@Component
-//@Scope("prototype")
 @Route("admin")
 @RolesAllowed("ADMIN")
 public class AdminView extends VerticalLayout {
-    private final SecurityService securityService;
-    private final UserService userService;
-    public final Grid<User> grid;
-    public Button createUserBtn = new Button("Добавить нового пользователя");
-    public final Button logout = new Button("Выйти");
-    private final HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
-    private final UserEditor userEditor;
+    /*private final */Grid<User> grid;
 
     @Autowired
     public AdminView(UserService userService, UserEditor userEditor, SecurityService securityService) {
-        this.userService = userService;
-        this.userEditor = userEditor;
-        this.securityService = securityService;
         this.grid = new Grid<>(User.class);
 
         // задаём порядок расположения колонок
@@ -55,6 +44,10 @@ public class AdminView extends VerticalLayout {
         // добавляем общие свойства для всех колонок
         grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
+        //    private final HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
+        Button createUserBtn = new Button("Добавить нового пользователя");
+        Button logout = new Button("Выйти");
+        HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
         add(horizontalLayout, grid, userEditor);
         grid.setItems(userService.getUsers());
 
