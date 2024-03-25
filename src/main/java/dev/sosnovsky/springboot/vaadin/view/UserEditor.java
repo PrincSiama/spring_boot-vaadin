@@ -19,17 +19,14 @@ import dev.sosnovsky.springboot.vaadin.model.User;
 import dev.sosnovsky.springboot.vaadin.service.UserService;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
 @UIScope
 @SpringComponent
 public class UserEditor extends VerticalLayout implements KeyNotifier {
-    UserService userService;
-    User user;
-
+    private final UserService userService;
+    private User user;
     private final TextField lastName = new TextField("Фамилия");
     private final TextField firstName = new TextField("Имя");
     private final TextField patronymic = new TextField("Отчество");
@@ -37,10 +34,8 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
     private final EmailField email = new EmailField("Email адрес");
     private final TextField phoneNumber = new TextField("Номер мобильного телефона");
     private final TextField imageLink = new TextField("Ссылка на изображение");
-
     private final Button cancel = new Button("Отмена");
-
-    Binder<User> binder = new Binder<>(User.class);
+    private final Binder<User> binder = new Binder<>(User.class);
     boolean validatedEmailAndPhoneNumber = true;
 
     @Setter
@@ -147,8 +142,8 @@ public class UserEditor extends VerticalLayout implements KeyNotifier {
             phoneNumber.setReadOnly(true);
             validatedEmailAndPhoneNumber = false;
 
-        // если пользователь новый, то разрешаем заполнение всех полей и проводим полную валидацию,
-        // включая поиск email и номера телефона в базе данных у существующих пользователей
+            // если пользователь новый, то разрешаем заполнение всех полей и проводим полную валидацию,
+            // включая поиск email и номера телефона в базе данных у существующих пользователей
         } else {
             email.setReadOnly(false);
             phoneNumber.setReadOnly(false);

@@ -16,7 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 @Route("admin")
 @RolesAllowed("ADMIN")
 public class AdminView extends VerticalLayout {
-    /*private final */Grid<User> grid;
+    private final Grid<User> grid;
 
     @Autowired
     public AdminView(UserService userService, UserEditor userEditor, SecurityService securityService) {
