@@ -44,7 +44,6 @@ public class AdminView extends VerticalLayout {
         // добавляем общие свойства для всех колонок
         grid.getColumns().forEach(column -> column.setAutoWidth(true).setResizable(true));
 
-        //    private final HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
         Button createUserBtn = new Button("Добавить нового пользователя");
         Button logout = new Button("Выйти");
         HorizontalLayout horizontalLayout = new HorizontalLayout(createUserBtn, logout);
