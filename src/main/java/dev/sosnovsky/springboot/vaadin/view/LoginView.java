@@ -2,7 +2,6 @@ package dev.sosnovsky.springboot.vaadin.view;
 
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
@@ -25,8 +24,7 @@ public class LoginView extends VerticalLayout {
         add(
                 new H1("Сервис для работы со списком пользователей"),
                 new H2("с использованием spring boot и vaadin"),
-                login,
-                new H3("задание выполнил Сосновский Сергей")
+                login
         );
     }
 }
